@@ -11,7 +11,13 @@ public:
     Sniffing();
 
 signals:
-    void ReadIP(QString i_ip);
+    void CompleteReadPacket(QString i_id,
+                            QString i_time,
+                            QString i_src,
+                            QString i_dst,
+                            QString i_protocol,
+                            QString i_length,
+                            QString i_info);
 public slots:
     void StartSniffing();
 };

@@ -19,7 +19,13 @@ public:
 private slots:
     void on_pushButton_clicked();
     void AddThreadForSniffing();
-    void AddIPToTable(QString i_IP);
+    void AddPacketToTable(QString i_id,
+                          QString i_time,
+                          QString i_src,
+                          QString i_dst,
+                          QString i_protocol,
+                          QString i_length,
+                          QString i_info);
 
     void on__btnStart_clicked();
 
