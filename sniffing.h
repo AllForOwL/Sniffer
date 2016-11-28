@@ -7,6 +7,7 @@
 #include <tins/tcp_ip/stream_follower.h>
 #include <tins/sniffer.h>
 
+
 using namespace Tins;
 using Tins::Packet;
 using Tins::Sniffer;
@@ -14,12 +15,13 @@ using Tins::SnifferConfiguration;
 using Tins::TCPIP::Stream;
 using Tins::TCPIP::StreamFollower;
 
+class MainWindow;
 
 class Sniffing : public QObject
 {
     Q_OBJECT
 public:
-    Sniffing();
+    Sniffing(MainWindow& i_window);
     static void on_server_data(Stream& i_stream);
     static void on_client_data(Stream& i_stream);
     static void on_new_connection(Stream& i_stream);
@@ -33,14 +35,29 @@ signals:
                             QString i_length,
                             QString i_info);
 
+    void CompleteReadData();
+
     void ReadClientData(QString i_data);
     void ReadServerData(QString i_data);
+
+    void StartReadDate();
+    void StartReadPacket();
+
 public slots:
     void StartSniffing();
+    void ReadData();
+    void ReadPacket();
+    void ReadNextPacket();
 
-private:
+public:
     static std::vector<QString> m_vecClientData;
     static std::vector<QString> m_vecServerData;
+    static Sniffing*            m_this;
+    Packet*         m_packet;
+    Sniffer*        m_sniffer;
+    StreamFollower* m_tcpStream;
+    MainWindow*     m_mainWindow;
+    bool m_readPacket;
 };
 
 #endif // SNIFFING_H

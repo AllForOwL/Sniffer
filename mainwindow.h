@@ -17,7 +17,6 @@ public:
     ~MainWindow();
 
 private slots:
-    void on_pushButton_clicked();
     void AddThreadForSniffing();
     void AddPacketToTable(QString i_id,
                           QString i_time,
@@ -26,8 +25,13 @@ private slots:
                           QString i_protocol,
                           QString i_length,
                           QString i_info);
+    void ReadData();
 
     void on__btnStart_clicked();
+
+signals:
+    void CompleteWriteData();
+    void CompleteWritePacket();
 
 private:
     Ui::MainWindow *ui;

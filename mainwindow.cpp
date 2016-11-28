@@ -11,16 +11,35 @@ MainWindow::MainWindow(QWidget *parent) :
 {
     ui->setupUi(this);
 
-    m_sniffing = new Sniffing();
+    m_sniffing = new Sniffing(*this);
 
     connect(ui->_btnStart, SIGNAL(clicked(bool)), this, SLOT(AddThreadForSniffing()));
     connect(m_sniffing, SIGNAL(CompleteReadPacket(QString,QString,QString,QString,QString,QString,QString)), this,
             SLOT(AddPacketToTable(QString,QString,QString,QString,QString,QString,QString)));
+    //connect(m_sniffing, SIGNAL(CompleteReadData()), this, SLOT(ReadData()));
+
 }
 
 MainWindow::~MainWindow()
 {
     delete ui;
+}
+
+void MainWindow::ReadData()
+{
+
+    ui->_textEdit->append(QString("\t\t\t\t Client Data \n"));
+    for (int i = 0; i < Sniffing::m_vecClientData.size(); i++)
+    {
+        ui->_textEdit->append(Sniffing::m_vecClientData[i]);
+    }
+    ui->_textEdit->append(QString("\t\t\t\t Server Data \n"));
+    for (int i = 0; i < Sniffing::m_vecServerData.size(); i++)
+    {
+        ui->_textEdit->append(Sniffing::m_vecServerData[i]);
+    }
+
+    emit CompleteWriteData();
 }
 
 void MainWindow::AddPacketToTable(QString i_id,
@@ -59,6 +78,8 @@ void MainWindow::AddPacketToTable(QString i_id,
    QTableWidgetItem* _addItem7 = new QTableWidgetItem;
    _addItem7->setText(i_info);
    ui->tableWidget->setItem(ui->tableWidget->rowCount() -  1, 6, _addItem7);
+
+   emit CompleteWritePacket();
 }
 
 void MainWindow::AddThreadForSniffing()
