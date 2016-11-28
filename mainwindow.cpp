@@ -26,15 +26,22 @@ MainWindow::~MainWindow()
 void MainWindow::ReadData()
 {
     ui->_textEdit->append(QString("\t\t\t\t Client Data \n"));
+    QString _clientData = "";
     for (int i = 0; i < Sniffing::m_vecClientData.size(); i++)
     {
-        ui->_textEdit->append(Sniffing::m_vecClientData[i]);
+        _clientData += Sniffing::m_vecClientData[i];
+        //ui->_textEdit->append(Sniffing::m_vecClientData);
     }
+    ui->_textEdit->append(_clientData);
+
     ui->_textEdit->append(QString("\t\t\t\t Server Data \n"));
+    QString _serverData = "";
     for (int i = 0; i < Sniffing::m_vecServerData.size(); i++)
     {
-        ui->_textEdit->append(Sniffing::m_vecServerData[i]);
+        _serverData += Sniffing::m_vecServerData[i];
+        //ui->_textEdit->append(Sniffing::m_vecServerData[i]);
     }
+    ui->_textEdit->append(_serverData);
 
     emit CompleteWriteData();
 }

@@ -18,7 +18,7 @@ bool Sniffing::m_readPacket = true;
 Sniffing::Sniffing(MainWindow& i_window) : m_mainWindow(&i_window)
 {
     m_packet    = new Packet();
-    m_sniffer   = new Sniffer("eth0");
+    m_sniffer   = new Sniffer("lo");
     m_tcpStream = new StreamFollower();
     m_tcpStream->new_stream_callback(&on_new_connection);
     m_this      = this;
@@ -117,6 +117,7 @@ void Sniffing::ReadHeaderPacket()
 void Sniffing::ReadNextPacket()
 {
     m_readPacket = true;
+    StartSniffing();
 }
 
 void Sniffing::StartSniffing()
