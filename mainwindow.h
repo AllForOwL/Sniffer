@@ -27,8 +27,6 @@ private slots:
                           QString i_info);
     void ReadData();
 
-    void on__btnStart_clicked();
-
 signals:
     void CompleteWriteData();
     void CompleteWritePacket();

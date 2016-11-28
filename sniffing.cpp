@@ -13,20 +13,20 @@ std::vector<QString> Sniffing::m_vecClientData;
 std::vector<QString> Sniffing::m_vecServerData;
 
 Sniffing* Sniffing::m_this = nullptr;
+bool Sniffing::m_readPacket = true;
 
 Sniffing::Sniffing(MainWindow& i_window) : m_mainWindow(&i_window)
 {
-    m_readPacket = true;
-
     m_packet    = new Packet();
     m_sniffer   = new Sniffer("eth0");
     m_tcpStream = new StreamFollower();
+    m_tcpStream->new_stream_callback(&on_new_connection);
     m_this      = this;
 
-    connect(this,           SIGNAL(StartReadDate()), this, SLOT(ReadData()));
-    connect(m_mainWindow,   SIGNAL(CompleteWriteData()), this, SLOT(ReadPacket()));
-    connect(m_mainWindow,   SIGNAL(CompleteWritePacket()), this, SLOT(ReadNextPacket()));
-    connect(m_this,         SIGNAL(CompleteReadData()), m_mainWindow, SLOT(ReadData()));
+    connect(this,           SIGNAL(StartReadData()),        this,           SLOT(ReadDataPacket()));
+    connect(m_mainWindow,   SIGNAL(CompleteWriteData()),    this,           SLOT(ReadHeaderPacket()));
+    connect(m_mainWindow,   SIGNAL(CompleteWritePacket()),  this,           SLOT(ReadNextPacket()));
+    connect(m_this,         SIGNAL(CompleteReadData()),     m_mainWindow,   SLOT(ReadData()));
 }
 
 void Sniffing::on_server_data(Stream& i_stream)
@@ -50,7 +50,7 @@ void Sniffing::on_server_data(Stream& i_stream)
     {
         i_stream.ignore_server_data();
     }
-
+    m_readPacket = false;
     emit m_this->CompleteReadData();
 }
 
@@ -70,14 +70,12 @@ void Sniffing::on_new_connection(Stream& i_stream)
     i_stream.auto_cleanup_payloads(false);
 }
 
-void Sniffing::ReadData()
+void Sniffing::ReadDataPacket()
 {
-    m_tcpStream->new_stream_callback(&on_new_connection);
     m_tcpStream->process_packet(*m_packet);
-    emit CompleteReadData();
 }
 
-void Sniffing::ReadPacket()
+void Sniffing::ReadHeaderPacket()
 {
     const IP& _ip   = m_packet->pdu()->rfind_pdu<IP>();
     const TCP& _tcp = m_packet->pdu()->rfind_pdu<TCP>();
@@ -123,17 +121,12 @@ void Sniffing::ReadNextPacket()
 
 void Sniffing::StartSniffing()
 {
-    while(true)
+    while(m_readPacket)
     {
-        if (m_readPacket)
+        *m_packet  = m_sniffer->next_packet();
+        if (m_packet->pdu()->find_pdu<TCP>())
         {
-            *m_packet  = m_sniffer->next_packet();
-
-            if (m_packet->pdu()->find_pdu<TCP>())
-            {
-               emit ReadData();
-               m_readPacket = false;
-            }
+           emit StartReadData();
         }
     }
 }

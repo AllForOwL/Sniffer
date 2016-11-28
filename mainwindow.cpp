@@ -16,8 +16,6 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(ui->_btnStart, SIGNAL(clicked(bool)), this, SLOT(AddThreadForSniffing()));
     connect(m_sniffing, SIGNAL(CompleteReadPacket(QString,QString,QString,QString,QString,QString,QString)), this,
             SLOT(AddPacketToTable(QString,QString,QString,QString,QString,QString,QString)));
-    //connect(m_sniffing, SIGNAL(CompleteReadData()), this, SLOT(ReadData()));
-
 }
 
 MainWindow::~MainWindow()
@@ -27,7 +25,6 @@ MainWindow::~MainWindow()
 
 void MainWindow::ReadData()
 {
-
     ui->_textEdit->append(QString("\t\t\t\t Client Data \n"));
     for (int i = 0; i < Sniffing::m_vecClientData.size(); i++)
     {
@@ -91,9 +88,4 @@ void MainWindow::AddThreadForSniffing()
     connect(_pThread,   SIGNAL(finished()), _pThread,   SLOT(deleteLater()));
 
     _pThread->start();
-}
-
-void MainWindow::on__btnStart_clicked()
-{
-
 }

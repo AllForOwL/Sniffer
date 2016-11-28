@@ -40,13 +40,13 @@ signals:
     void ReadClientData(QString i_data);
     void ReadServerData(QString i_data);
 
-    void StartReadDate();
+    void StartReadData();
     void StartReadPacket();
 
 public slots:
     void StartSniffing();
-    void ReadData();
-    void ReadPacket();
+    void ReadDataPacket();
+    void ReadHeaderPacket();
     void ReadNextPacket();
 
 public:
@@ -57,7 +57,7 @@ public:
     Sniffer*        m_sniffer;
     StreamFollower* m_tcpStream;
     MainWindow*     m_mainWindow;
-    bool m_readPacket;
+    static bool m_readPacket;
 };
 
 #endif // SNIFFING_H
