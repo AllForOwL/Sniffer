@@ -27,6 +27,14 @@ private slots:
                           QString i_info);
     void ReadData();
 
+    void on__btnStop_clicked();
+
+    void on__btnPause_clicked();
+
+    void on_pushButton_clicked();
+
+    void on__btnContinue_clicked();
+
 signals:
     void CompleteWriteData();
     void CompleteWritePacket();

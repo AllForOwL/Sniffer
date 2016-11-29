@@ -18,15 +18,35 @@ bool Sniffing::m_readPacket = true;
 Sniffing::Sniffing(MainWindow& i_window) : m_mainWindow(&i_window)
 {
     m_packet    = new Packet();
-    m_sniffer   = new Sniffer("lo");
+    m_sniffer   = new Sniffer("eth0");
     m_tcpStream = new StreamFollower();
     m_tcpStream->new_stream_callback(&on_new_connection);
     m_this      = this;
+    m_stateSniff = StateSniff::WORKING;
 
     connect(this,           SIGNAL(StartReadData()),        this,           SLOT(ReadDataPacket()));
     connect(m_mainWindow,   SIGNAL(CompleteWriteData()),    this,           SLOT(ReadHeaderPacket()));
     connect(m_mainWindow,   SIGNAL(CompleteWritePacket()),  this,           SLOT(ReadNextPacket()));
     connect(m_this,         SIGNAL(CompleteReadData()),     m_mainWindow,   SLOT(ReadData()));
+}
+
+void Sniffing::StopSniffing()
+{
+    m_stateSniff = StateSniff::STOP;
+    m_readPacket = false;
+}
+
+void Sniffing::PauseSniffing()
+{
+    m_stateSniff = StateSniff::PAUSE;
+    m_readPacket = false;
+}
+
+void Sniffing::ContinueSniffing()
+{
+    m_stateSniff = StateSniff::WORKING;
+    m_readPacket = true;
+    StartSniffing();
 }
 
 void Sniffing::on_server_data(Stream& i_stream)
@@ -46,20 +66,21 @@ void Sniffing::on_server_data(Stream& i_stream)
         m_vecServerData.push_back(QString(_server_payload[i]));
     }
 
-    if (i_stream.server_payload().size() > MAX_PAYLOAD)
-    {
-        i_stream.ignore_server_data();
-    }
+//    if (i_stream.server_payload().size() > MAX_PAYLOAD)
+//    {
+//     i_stream.ignore_server_data();
+//    }
+
     m_readPacket = false;
     emit m_this->CompleteReadData();
 }
 
 void Sniffing::on_client_data(Stream& i_stream)
 {
-    if (i_stream.client_payload().size() > MAX_PAYLOAD)
-    {
-        i_stream.ignore_client_data();
-    }
+//    if (i_stream.client_payload().size() > MAX_PAYLOAD)
+//    {
+//        i_stream.ignore_client_data();
+//    }
 }
 
 void Sniffing::on_new_connection(Stream& i_stream)
@@ -77,6 +98,8 @@ void Sniffing::ReadDataPacket()
 
 void Sniffing::ReadHeaderPacket()
 {
+    m_stateSniff = StateSniff::READ_PACKET;
+
     const IP& _ip   = m_packet->pdu()->rfind_pdu<IP>();
     const TCP& _tcp = m_packet->pdu()->rfind_pdu<TCP>();
 
@@ -116,8 +139,12 @@ void Sniffing::ReadHeaderPacket()
 
 void Sniffing::ReadNextPacket()
 {
-    m_readPacket = true;
-    StartSniffing();
+    if (m_stateSniff == StateSniff::READ_PACKET)
+    {
+        m_stateSniff = StateSniff::WORKING;
+        m_readPacket = true;
+        StartSniffing();
+    }
 }
 
 void Sniffing::StartSniffing()

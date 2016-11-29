@@ -21,10 +21,23 @@ class Sniffing : public QObject
 {
     Q_OBJECT
 public:
+
+    enum StateSniff
+    {
+        WORKING,
+        STOP,
+        PAUSE,
+        READ_PACKET
+    };
+
     Sniffing(MainWindow& i_window);
     static void on_server_data(Stream& i_stream);
     static void on_client_data(Stream& i_stream);
     static void on_new_connection(Stream& i_stream);
+
+    void StopSniffing();
+    void PauseSniffing();
+    void ContinueSniffing();
 
 signals:
     void CompleteReadPacket(QString i_id,
@@ -58,6 +71,7 @@ public:
     StreamFollower* m_tcpStream;
     MainWindow*     m_mainWindow;
     static bool m_readPacket;
+    StateSniff  m_stateSniff;
 };
 
 #endif // SNIFFING_H

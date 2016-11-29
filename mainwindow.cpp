@@ -96,3 +96,24 @@ void MainWindow::AddThreadForSniffing()
 
     _pThread->start();
 }
+
+void MainWindow::on__btnStop_clicked()
+{
+    m_sniffing->StopSniffing();
+}
+
+/*  Tasks on today(29:11:2016)
+ * - find string!!!;
+ * - one line;
+ * - working button "stop";
+*/
+
+void MainWindow::on__btnPause_clicked()
+{
+    m_sniffing->PauseSniffing();
+}
+
+void MainWindow::on__btnContinue_clicked()
+{
+    m_sniffing->ContinueSniffing();
+}
