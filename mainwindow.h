@@ -25,7 +25,7 @@ public:
     explicit MainWindow(QWidget *parent = 0);
     ~MainWindow();
 
-    void Find(QString i_textForFind);
+    void Find();
 
 private slots:
     void AddThreadForSniffing();

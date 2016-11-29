@@ -31,12 +31,11 @@ MainWindow::~MainWindow()
     delete ui;
 }
 
-void MainWindow::Find(QString i_textForFind)
+void MainWindow::Find()
 {
-    QString _textForFind = i_textForFind;
+    //std::string _str = ui->_textEdit->placeholderText();
 
-
-    // here has been code for find string
+    //std::find(_str.begin(), _str.end(), m_strForFind);
 }
 
 /*virtual*/ void MainWindow::keyPressEvent(QKeyEvent *i_event)
@@ -69,6 +68,8 @@ void MainWindow::Find(QString i_textForFind)
             }
             ui->_textEdit->setFocus();
         }
+
+        Find();
     }
 }
 
@@ -92,10 +93,16 @@ void MainWindow::ReadData()
 {
     ui->_textEdit->append(QString("\t\t\t\t Client Data \n"));
     QString _clientData = "";
+    QString _symbol = " ";
+    QChar    _chSymbol = ' ';
     for (int i = 0; i < Sniffing::m_vecClientData.size(); i++)
     {
-        _clientData += Sniffing::m_vecClientData[i];
-        //ui->_textEdit->append(Sniffing::m_vecClientData);
+        _symbol = Sniffing::m_vecClientData[i];
+        _chSymbol = _symbol.at(0);
+        if (_chSymbol.unicode() >= 32 && _chSymbol.unicode() <= 127)
+        {
+            _clientData += _chSymbol;
+        }
     }
     ui->_textEdit->append(_clientData);
 
@@ -103,8 +110,12 @@ void MainWindow::ReadData()
     QString _serverData = "";
     for (int i = 0; i < Sniffing::m_vecServerData.size(); i++)
     {
-        _serverData += Sniffing::m_vecServerData[i];
-        //ui->_textEdit->append(Sniffing::m_vecServerData[i]);
+        _symbol = Sniffing::m_vecServerData[i];
+        _chSymbol = _symbol.at(0);
+        if (_chSymbol.unicode() >= 32 && _chSymbol.unicode() <= 127)
+        {
+            _serverData += _chSymbol;
+        }
     }
     ui->_textEdit->append(_serverData);
 
