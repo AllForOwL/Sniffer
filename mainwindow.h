@@ -3,6 +3,8 @@
 
 #include <QMainWindow>
 #include "sniffing.h"
+#include <QShortcut>
+#include <QKeyEvent>
 
 namespace Ui {
 class MainWindow;
@@ -13,8 +15,17 @@ class MainWindow : public QMainWindow
     Q_OBJECT
 
 public:
+
+    enum StateFind
+    {
+        IN_HEADER,
+        IN_DATA
+    };
+
     explicit MainWindow(QWidget *parent = 0);
     ~MainWindow();
+
+    void Find(QString i_textForFind);
 
 private slots:
     void AddThreadForSniffing();
@@ -35,6 +46,10 @@ private slots:
 
     void on__btnContinue_clicked();
 
+    void ShowLineForFind();
+
+    virtual void keyPressEvent(QKeyEvent* i_event);
+
 signals:
     void CompleteWriteData();
     void CompleteWritePacket();
@@ -42,6 +57,9 @@ signals:
 private:
     Ui::MainWindow *ui;
     Sniffing* m_sniffing;
+    QShortcut* m_find;
+    StateFind m_stateFind;
+    QString m_strForFind;
 };
 
 #endif // MAINWINDOW_H

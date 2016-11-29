@@ -10,17 +10,82 @@ MainWindow::MainWindow(QWidget *parent) :
     ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
+    ui->_lnTextForSearchHeader->setVisible(false);
+    ui->_lnTextForSearchData->setVisible(false);
+
+    m_stateFind = StateFind::IN_DATA;
 
     m_sniffing = new Sniffing(*this);
 
     connect(ui->_btnStart, SIGNAL(clicked(bool)), this, SLOT(AddThreadForSniffing()));
     connect(m_sniffing, SIGNAL(CompleteReadPacket(QString,QString,QString,QString,QString,QString,QString)), this,
             SLOT(AddPacketToTable(QString,QString,QString,QString,QString,QString,QString)));
+
+    m_find = new QShortcut(QKeySequence("Ctrl+F"), this);
+    connect(m_find, SIGNAL(activated()), this, SLOT(ShowLineForFind()));
+    m_find->setAutoRepeat(false);
 }
 
 MainWindow::~MainWindow()
 {
     delete ui;
+}
+
+void MainWindow::Find(QString i_textForFind)
+{
+    QString _textForFind = i_textForFind;
+
+
+    // here has been code for find string
+}
+
+/*virtual*/ void MainWindow::keyPressEvent(QKeyEvent *i_event)
+{
+    if (i_event->key() == Qt::Key_Enter)
+    {
+        if (m_stateFind == StateFind::IN_HEADER)
+        {
+            if (ui->_lnTextForSearchHeader->text() == "")
+            {
+                ui->_lnTextForSearchHeader->setPalette(QPalette(Qt::red));
+            }
+            else
+            {
+                ui->_lnTextForSearchHeader->setPalette(QPalette(Qt::green));
+                m_strForFind = ui->_lnTextForSearchHeader->text();
+            }
+            ui->tableWidget->setFocus();
+        }
+        else
+        {
+            if (ui->_lnTextForSearchData->text() == "")
+            {
+                ui->_lnTextForSearchData->setPalette(QPalette(Qt::red));
+            }
+            else
+            {
+                ui->_lnTextForSearchData->setPalette(QPalette(Qt::green));
+                m_strForFind = ui->_lnTextForSearchData->text();
+            }
+            ui->_textEdit->setFocus();
+        }
+    }
+}
+
+void MainWindow::ShowLineForFind()
+{
+    if (this->focusWidget() == ui->tableWidget)
+    {
+        ui->_lnTextForSearchHeader->setVisible(true);
+        this->setFocusProxy(ui->_lnTextForSearchHeader);
+        m_stateFind = StateFind::IN_HEADER;
+    }
+    else if (this->focusWidget() == ui->_textEdit)
+    {
+        ui->_lnTextForSearchData->setVisible(true);
+        this->setFocusProxy(ui->_lnTextForSearchData);
+        m_stateFind = StateFind::IN_DATA;
+    }
 }
 
 void MainWindow::ReadData()
