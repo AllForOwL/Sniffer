@@ -5,6 +5,7 @@
 #include "sniffing.h"
 #include <QShortcut>
 #include <QKeyEvent>
+#include <QTextDocument>
 
 namespace Ui {
 class MainWindow;
@@ -60,6 +61,10 @@ private:
     QShortcut* m_find;
     StateFind m_stateFind;
     QString m_strForFind;
+
+    QTextDocument*  m_allTextField;
+//    QTextCursor*    m_highlightCursor;
+//    QTextCursor*    m_cursor;
 };
 
 #endif // MAINWINDOW_H

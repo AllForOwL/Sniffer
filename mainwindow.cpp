@@ -2,8 +2,11 @@
 #include "ui_mainwindow.h"
 #include "sniffing.h"
 #include <QThread>
+#include <QMessageBox>
 
 using namespace std;
+
+const int CNT_CODE_ENTER = 16777220;
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -12,6 +15,8 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->setupUi(this);
     ui->_lnTextForSearchHeader->setVisible(false);
     ui->_lnTextForSearchData->setVisible(false);
+
+    m_allTextField = new QTextDocument();
 
     m_stateFind = StateFind::IN_DATA;
 
@@ -33,14 +38,44 @@ MainWindow::~MainWindow()
 
 void MainWindow::Find()
 {
-    //std::string _str = ui->_textEdit->placeholderText();
+    bool _found = false;
 
-    //std::find(_str.begin(), _str.end(), m_strForFind);
+    QTextCursor _highlightCursor(m_allTextField);
+    _highlightCursor.setVisualNavigation(true);
+    QTextCursor _cursor(m_allTextField);
+
+    _cursor.beginEditBlock();
+
+    QTextCharFormat _plainFormat(_highlightCursor.charFormat());
+    QTextCharFormat _colorFormat = _plainFormat;
+    _colorFormat.setForeground(Qt::green);
+
+    while (!_highlightCursor.isNull() && !_highlightCursor.atEnd())
+    {
+        _highlightCursor = m_allTextField->find(m_strForFind, _highlightCursor, QTextDocument::FindWholeWords);
+
+        if (!_highlightCursor.isNull())
+        {
+            _found = true;
+            _highlightCursor.movePosition(QTextCursor::WordRight,
+                                          QTextCursor::KeepAnchor);
+            _highlightCursor.mergeCharFormat(_colorFormat);
+        }
+    }
+
+     _cursor.endEditBlock();
+
+     if (_found == false)
+     {
+          QMessageBox::information(this, tr("Слово не знайдено"),
+              "Вибачте, введене слово не знайдено(((");
+     }
 }
 
 /*virtual*/ void MainWindow::keyPressEvent(QKeyEvent *i_event)
 {
-    if (i_event->key() == Qt::Key_Enter)
+    int _key = i_event->key();
+    if (_key == CNT_CODE_ENTER)
     {
         if (m_stateFind == StateFind::IN_HEADER)
         {
@@ -52,6 +87,8 @@ void MainWindow::Find()
             {
                 ui->_lnTextForSearchHeader->setPalette(QPalette(Qt::green));
                 m_strForFind = ui->_lnTextForSearchHeader->text();
+                //m_allTextField = ui->tableWidget;
+                Find();
             }
             ui->tableWidget->setFocus();
         }
@@ -65,11 +102,11 @@ void MainWindow::Find()
             {
                 ui->_lnTextForSearchData->setPalette(QPalette(Qt::green));
                 m_strForFind = ui->_lnTextForSearchData->text();
+                m_allTextField = ui->_textEdit->document();
+                Find();
             }
             ui->_textEdit->setFocus();
         }
-
-        Find();
     }
 }
 
