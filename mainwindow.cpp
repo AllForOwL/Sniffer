@@ -4,6 +4,12 @@
 #include <QThread>
 #include <QMessageBox>
 
+QString g_regexHttp     ("^(http:\/\/)?([\da-z\.-]+)\.([a-z\.]{2,6})([\/\w \.-]*)*\/?$/");
+QString g_regexHttpS    ("^(https:\/\/)?([\da-z\.-]+)\.([a-z\.]{2,6})([\/\w \.-]*)*\/?$/");
+QString g_regexUsername ("[0-9]{2}");
+QString g_regexPassword ("^[a-z0-9_-]{6,18}$");
+QString g_regexEmail    ("^([a-z0-9_\.-]+)@([\da-z\.-]+)\.([a-z\.]{2,6})$");
+
 using namespace std;
 
 const int CNT_CODE_ENTER = 16777220;
@@ -15,6 +21,8 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->setupUi(this);
     ui->_lnTextForSearchHeader->setVisible(false);
     ui->_lnTextForSearchData->setVisible(false);
+
+    m_regex = " ";
 
     m_allTextField = new QTextDocument();
 
@@ -65,7 +73,7 @@ void MainWindow::Find()
 
      _cursor.endEditBlock();
 
-     if (_found == false)
+     if (!_found)
      {
           QMessageBox::information(this, tr("Слово не знайдено"),
               "Вибачте, введене слово не знайдено(((");
@@ -126,7 +134,43 @@ void MainWindow::ShowLineForFind()
     }
 }
 
-void MainWindow::ReadData()
+void MainWindow::ReadDataRegex()
+{
+    QString _dataClient;
+    for (int i = 0; i < Sniffing::m_vecClientData.size(); i++)
+    {
+        _dataClient += Sniffing::m_vecClientData[i];
+    }
+
+    ui->_textEdit->append(QString("\t\t\t\t Client Data \n"));
+    QRegularExpression _regExpression(m_regex);
+    QRegularExpressionMatch _match = _regExpression.match(_dataClient);
+    if (_match.hasMatch())
+    {
+        for (int i = 0; i < _match.lastCapturedIndex(); i++)
+        {
+            ui->_textEdit->append(_match.captured(i));
+        }
+    }
+
+    ui->_textEdit->append(QString("\t\t\t\t Server Data \n"));
+    QString _dataServer;
+    for (int i = 0; i < Sniffing::m_vecServerData.size(); i++)
+    {
+        _dataServer += Sniffing::m_vecServerData[i];
+    }
+
+    _match = _regExpression.match(_dataServer);
+    if (_match.hasMatch())
+    {
+        for (int i = 0; i < _match.lastCapturedIndex(); i++)
+        {
+            ui->_textEdit->append(_match.captured(i));
+        }
+    }
+}
+
+void MainWindow::ReadDataAll()
 {
     ui->_textEdit->append(QString("\t\t\t\t Client Data \n"));
     QString _clientData = "";
@@ -155,6 +199,18 @@ void MainWindow::ReadData()
         }
     }
     ui->_textEdit->append(_serverData);
+}
+
+void MainWindow::ReadData()
+{
+    if (m_regex == " ")
+    {
+        ReadDataAll();
+    }
+    else
+    {
+        ReadDataRegex();
+    }
 
     emit CompleteWriteData();
 }
@@ -229,4 +285,44 @@ void MainWindow::on__btnPause_clicked()
 void MainWindow::on__btnContinue_clicked()
 {
     m_sniffing->ContinueSniffing();
+}
+
+void MainWindow::on__chbHttp_stateChanged(int arg1)
+{
+    if (arg1 == Qt::Checked)
+    {
+        m_regex = g_regexHttp;
+    }
+}
+
+void MainWindow::on__chbHttps_stateChanged(int arg1)
+{
+    if (arg1 == Qt::Checked)
+    {
+        m_regex = g_regexHttpS;
+    }
+}
+
+void MainWindow::on__chbUsername_stateChanged(int arg1)
+{
+    if (arg1 == Qt::Checked)
+    {
+        m_regex = g_regexUsername;
+    }
+}
+
+void MainWindow::on__chbPassword_stateChanged(int arg1)
+{
+    if (arg1 == Qt::Checked)
+    {
+        m_regex = g_regexPassword;
+    }
+}
+
+void MainWindow::on_checkBox_stateChanged(int arg1)
+{
+    if (arg1 == Qt::Checked)
+    {
+        m_regex = g_regexEmail;
+    }
 }

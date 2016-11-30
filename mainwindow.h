@@ -26,6 +26,9 @@ public:
     explicit MainWindow(QWidget *parent = 0);
     ~MainWindow();
 
+    void ReadDataRegex();
+    void ReadDataAll();
+
     void Find();
 
 private slots:
@@ -51,6 +54,16 @@ private slots:
 
     virtual void keyPressEvent(QKeyEvent* i_event);
 
+    void on__chbHttp_stateChanged(int arg1);
+
+    void on__chbHttps_stateChanged(int arg1);
+
+    void on__chbUsername_stateChanged(int arg1);
+
+    void on__chbPassword_stateChanged(int arg1);
+
+    void on_checkBox_stateChanged(int arg1);
+
 signals:
     void CompleteWriteData();
     void CompleteWritePacket();
@@ -63,8 +76,7 @@ private:
     QString m_strForFind;
 
     QTextDocument*  m_allTextField;
-//    QTextCursor*    m_highlightCursor;
-//    QTextCursor*    m_cursor;
+    QString m_regex;
 };
 
 #endif // MAINWINDOW_H

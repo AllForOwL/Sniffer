@@ -23,6 +23,7 @@ Sniffing::Sniffing(MainWindow& i_window) : m_mainWindow(&i_window)
     m_tcpStream->new_stream_callback(&on_new_connection);
     m_this      = this;
     m_stateSniff = StateSniff::WORKING;
+    m_regex = " ";
 
     connect(this,           SIGNAL(StartReadData()),        this,           SLOT(ReadDataPacket()));
     connect(m_mainWindow,   SIGNAL(CompleteWriteData()),    this,           SLOT(ReadHeaderPacket()));
@@ -68,7 +69,7 @@ void Sniffing::on_server_data(Stream& i_stream)
 
 //    if (i_stream.server_payload().size() > MAX_PAYLOAD)
 //    {
-//     i_stream.ignore_server_data();
+//      i_stream.ignore_server_data();
 //    }
 
     m_readPacket = false;

@@ -72,6 +72,7 @@ public:
     MainWindow*     m_mainWindow;
     static bool m_readPacket;
     StateSniff  m_stateSniff;
+    QString m_regex;
 };
 
 #endif // SNIFFING_H
