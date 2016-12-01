@@ -26,6 +26,7 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->_lnLengthFindData->setVisible(false);
 
     m_regex = " ";
+    m_lengtFindExpression = 0;
 
     m_allTextField = new QTextDocument();
 
@@ -61,6 +62,7 @@ void MainWindow::Find()
     QTextCharFormat _colorFormat = _plainFormat;
     _colorFormat.setForeground(Qt::green);
 
+    QString _allText = ui->_textEdit->toPlainText();
     while (!_highlightCursor.isNull() && !_highlightCursor.atEnd())
     {
         _highlightCursor = m_allTextField->find(m_strForFind, _highlightCursor, QTextDocument::FindWholeWords);
@@ -71,9 +73,35 @@ void MainWindow::Find()
             _highlightCursor.movePosition(QTextCursor::WordRight,
                                           QTextCursor::KeepAnchor);
             _highlightCursor.mergeCharFormat(_colorFormat);
+
+            int _quentityMatches = 0;
+             for (int i = 0; i < _allText.size() - m_strForFind.size(); i += m_strForFind.size())
+             {
+                QString _str = "";
+                for (int i = 0; i < m_strForFind.size(); i++)
+                {
+                    _str += _allText[i];
+                }
+                _allText.remove(0, m_strForFind.size());
+
+                if (_str != m_strForFind)
+                {
+                    continue;
+                }
+                else
+                {
+                    QString _strForAppendInEdit = _str;
+                    for (int i = 0; i < m_lengtFindExpression; i++)
+                    {
+                        _strForAppendInEdit += _allText[i];
+                    }
+                    _allText.remove(0, m_lengtFindExpression);
+                    ui->_lnTextFindWord->append(_strForAppendInEdit);
+                    i += m_lengtFindExpression;
+                }
+             }
         }
     }
-
      _cursor.endEditBlock();
 
      if (!_found)
@@ -113,6 +141,8 @@ void MainWindow::Find()
             {
                 ui->_lnTextForSearchData->setPalette(QPalette(Qt::green));
                 m_strForFind = ui->_lnTextForSearchData->text();
+                m_lengtFindExpression = 0;
+                m_lengtFindExpression = ui->_lnLengthFindData->text().toInt();
                 m_allTextField = ui->_textEdit->document();
                 Find();
             }

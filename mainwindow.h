@@ -86,6 +86,7 @@ private:
     QShortcut* m_find;
     StateFind m_stateFind;
     QString m_strForFind;
+    int     m_lengtFindExpression;
 
     QTextDocument*  m_allTextField;
     QString m_regex;
