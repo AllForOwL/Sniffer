@@ -64,6 +64,18 @@ private slots:
 
     void on_checkBox_stateChanged(int arg1);
 
+    void on_checkBox_2_stateChanged(int arg1);
+
+    void on__chHttp_stateChanged(int arg1);
+
+    void on__chHttps_stateChanged(int arg1);
+
+    void on__chUsername_stateChanged(int arg1);
+
+    void on__chEmail_stateChanged(int arg1);
+
+    void on__chPassword_stateChanged(int arg1);
+
 signals:
     void CompleteWriteData();
     void CompleteWritePacket();

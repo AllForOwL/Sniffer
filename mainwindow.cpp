@@ -3,12 +3,14 @@
 #include "sniffing.h"
 #include <QThread>
 #include <QMessageBox>
+//(https:\\/\\/)[a-zA-Z0-9\\.\\/\\=\\#\\%\\&\\(\\)\\+\\-\\*\\?]+
 
-QString g_regexHttp     ("^(http:\/\/)?([\da-z\.-]+)\.([a-z\.]{2,6})([\/\w \.-]*)*\/?$/");
-QString g_regexHttpS    ("^(https:\/\/)?([\da-z\.-]+)\.([a-z\.]{2,6})([\/\w \.-]*)*\/?$/");
-QString g_regexUsername ("[0-9]{2}");
-QString g_regexPassword ("^[a-z0-9_-]{6,18}$");
-QString g_regexEmail    ("^([a-z0-9_\.-]+)@([\da-z\.-]+)\.([a-z\.]{2,6})$");
+QString g_regexHttp     ("(http:\\/\\/[a-zA-Z0-9\\.\\/\\=\\#\\%\\&\\(\\)\\+\\-\\*\\?]+");
+QString g_regexHttpS    ("(https:\\/\\/)?[a-zA-Z0-9\\.\\/\\=\\#\\%\\&\\(\\)\\+\\-\\*\\?]+");
+QString g_regexUsername ("(login:)");
+QString g_regexPassword ("[a-z0-9_-]{6,18}$");
+QString g_regexEmail    ("([a-z0-9_\\.-]+)@([\\da-z\\.-]+)\\.([a-z\\.]{2,6})$");
+QString g_regexWWW      ("(www.)[a-zA-Z0-9\\.\\/\\=\\#\\%\\&\\(\\)\\+\\-\\*\\?]+");
 
 using namespace std;
 
@@ -21,6 +23,7 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->setupUi(this);
     ui->_lnTextForSearchHeader->setVisible(false);
     ui->_lnTextForSearchData->setVisible(false);
+    ui->_lnLengthFindData->setVisible(false);
 
     m_regex = " ";
 
@@ -129,6 +132,7 @@ void MainWindow::ShowLineForFind()
     else if (this->focusWidget() == ui->_textEdit)
     {
         ui->_lnTextForSearchData->setVisible(true);
+        ui->_lnLengthFindData->setVisible(true);
         this->setFocusProxy(ui->_lnTextForSearchData);
         m_stateFind = StateFind::IN_DATA;
     }
@@ -147,7 +151,7 @@ void MainWindow::ReadDataRegex()
     QRegularExpressionMatch _match = _regExpression.match(_dataClient);
     if (_match.hasMatch())
     {
-        for (int i = 0; i < _match.lastCapturedIndex(); i++)
+        for (int i = 1; i <= _match.lastCapturedIndex(); i++)
         {
             ui->_textEdit->append(_match.captured(i));
         }
@@ -163,7 +167,7 @@ void MainWindow::ReadDataRegex()
     _match = _regExpression.match(_dataServer);
     if (_match.hasMatch())
     {
-        for (int i = 0; i < _match.lastCapturedIndex(); i++)
+        for (int i = 1; i < _match.lastCapturedIndex(); i++)
         {
             ui->_textEdit->append(_match.captured(i));
         }
@@ -271,12 +275,6 @@ void MainWindow::on__btnStop_clicked()
     m_sniffing->StopSniffing();
 }
 
-/*  Tasks on today(29:11:2016)
- * - find string!!!;
- * - one line;
- * - working button "stop";
-*/
-
 void MainWindow::on__btnPause_clicked()
 {
     m_sniffing->PauseSniffing();
@@ -287,7 +285,7 @@ void MainWindow::on__btnContinue_clicked()
     m_sniffing->ContinueSniffing();
 }
 
-void MainWindow::on__chbHttp_stateChanged(int arg1)
+void MainWindow::on__chHttp_stateChanged(int arg1)
 {
     if (arg1 == Qt::Checked)
     {
@@ -295,7 +293,7 @@ void MainWindow::on__chbHttp_stateChanged(int arg1)
     }
 }
 
-void MainWindow::on__chbHttps_stateChanged(int arg1)
+void MainWindow::on__chHttps_stateChanged(int arg1)
 {
     if (arg1 == Qt::Checked)
     {
@@ -303,7 +301,7 @@ void MainWindow::on__chbHttps_stateChanged(int arg1)
     }
 }
 
-void MainWindow::on__chbUsername_stateChanged(int arg1)
+void MainWindow::on__chUsername_stateChanged(int arg1)
 {
     if (arg1 == Qt::Checked)
     {
@@ -311,18 +309,18 @@ void MainWindow::on__chbUsername_stateChanged(int arg1)
     }
 }
 
-void MainWindow::on__chbPassword_stateChanged(int arg1)
-{
-    if (arg1 == Qt::Checked)
-    {
-        m_regex = g_regexPassword;
-    }
-}
-
-void MainWindow::on_checkBox_stateChanged(int arg1)
+void MainWindow::on__chEmail_stateChanged(int arg1)
 {
     if (arg1 == Qt::Checked)
     {
         m_regex = g_regexEmail;
+    }
+}
+
+void MainWindow::on__chPassword_stateChanged(int arg1)
+{
+    if (arg1 == Qt::Checked)
+    {
+        m_regex = g_regexPassword;
     }
 }

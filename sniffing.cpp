@@ -67,21 +67,13 @@ void Sniffing::on_server_data(Stream& i_stream)
         m_vecServerData.push_back(QString(_server_payload[i]));
     }
 
-//    if (i_stream.server_payload().size() > MAX_PAYLOAD)
-//    {
-//      i_stream.ignore_server_data();
-//    }
-
     m_readPacket = false;
     emit m_this->CompleteReadData();
 }
 
 void Sniffing::on_client_data(Stream& i_stream)
 {
-//    if (i_stream.client_payload().size() > MAX_PAYLOAD)
-//    {
-//        i_stream.ignore_client_data();
-//    }
+
 }
 
 void Sniffing::on_new_connection(Stream& i_stream)
